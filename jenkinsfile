@@ -1,15 +1,23 @@
 pipeline {
     agent any
     
+    options {
+        timeout(time: 1, unit: 'HOURS')
+    }
+    
+    tools {
+        // Specify the Node.js installation managed by Jenkins
+        nodejs 'nodejs-installation-name'
+    }
+    
     stages {
         stage('Build') {
             steps {
-                // Install Node.js and npm if not already installed
+                // Install dependencies and build the React app
                 sh 'npm install'
-                // Build the React app
                 sh 'npm run build'
-                // Create a build artifact (e.g., a Docker image)
-                // For this example, let's assume we are building a Docker image
+                // Create a build artifact (e.g., Docker image)
+                // For simplicity, let's assume we are building a Docker image
                 sh 'docker build -t my-react-app .'
                 // Save the Docker image as an artifact
                 archiveArtifacts artifacts: 'Dockerfile,*.json,*.js,dist/*', fingerprint: true
@@ -18,7 +26,7 @@ pipeline {
         
         stage('Test') {
             steps {
-                // Run automated tests using Jest (assuming you're using Jest for testing)
+                // Run automated tests using Jest (assuming Jest is used for testing)
                 sh 'npm test'
             }
         }
@@ -36,7 +44,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 // Deploy the application to a test environment (e.g., staging server or Docker container)
-                // For this example, let's assume we are deploying to a Docker container
+                // For simplicity, let's assume we are deploying to a Docker container
                 sh 'docker-compose -f docker-compose.test.yml up -d'
             }
         }
