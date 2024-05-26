@@ -1,41 +1,87 @@
 pipeline {
     agent any
-    environment {
-        NODEJS_HOME = tool name: 'nodejs', type: 'NodeJS'
-        PATH = "${env.NODEJS_HOME}/bin:${env.PATH}"
+    
+    options {
+        timeout(time: 1, unit: 'HOURS')
     }
+    
+    tools {
+        nodejs 'NodeJS 14' // Replace with your Node.js installation name
+    }
+    
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/HarshithaShashidhara/SIT753_6.2HD.git', branch: 'main'
+                checkout scm
+                // List files to ensure package.json is present
+                sh 'ls -l'
+                // Show contents of package.json for debugging purposes
+                sh 'cat package.json'
             }
         }
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
+        
         stage('Build') {
             steps {
-                sh 'npm run build'
+                sh 'npm install'
+                // Check if there is a build script, otherwise skip
+                script {
+                    def packageJson = readFile('package.json')
+                    def pkg = new groovy.json.JsonSlurper().parseText(packageJson)
+                    if (pkg.scripts && pkg.scripts.build) {
+                        sh 'npm run build'
+                    } else {
+                        echo 'No build script defined in package.json'
+                    }
+                }
+                // If a Dockerfile exists, build the Docker image
+                script {
+                    if (fileExists('Dockerfile')) {
+                        sh 'docker build -t my-node-app .'
+                    } else {
+                        echo 'No Dockerfile found, skipping Docker build'
+                    }
+                }
+                // Save artifacts, if any
+                archiveArtifacts artifacts: '*.json,*.js,dist/*', fingerprint: true
             }
         }
+        
         stage('Test') {
             steps {
                 sh 'npm test'
             }
         }
-        // Add additional stages as needed
-    }
-    post {
-        always {
-            echo 'Pipeline finished.'
+        
+        stage('Code Quality Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
+                }
+            }
         }
-        success {
-            echo 'Pipeline succeeded.'
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    if (fileExists('docker-compose.test.yml')) {
+                        sh 'docker-compose -f docker-compose.test.yml up -d'
+                    } else {
+                        echo 'No docker-compose.test.yml found, skipping Docker Compose'
+                    }
+                }
+            }
         }
-        failure {
-            echo 'Pipeline failed.'
+        
+        stage('Release') {
+            steps {
+                input message: 'Deploy to production?', ok: 'Release'
+            }
+        }
+        
+        stage('Monitoring and Alerting') {
+            steps {
+                input message: 'Configure monitoring and alerting for production?', ok: 'Done'
+            }
         }
     }
 }
