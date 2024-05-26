@@ -25,8 +25,9 @@ pipeline {
                 sh 'npm install'
                 // Check if there is a build script, otherwise skip
                 script {
-                    def pkg = readJSON file: 'package.json'
-                    if (pkg.scripts.build) {
+                    def packageJson = readFile('package.json')
+                    def pkg = new groovy.json.JsonSlurper().parseText(packageJson)
+                    if (pkg.scripts && pkg.scripts.build) {
                         sh 'npm run build'
                     } else {
                         echo 'No build script defined in package.json'
