@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                // Install Node.js and npm if not already installed
+                sh 'npm install'
+                // Build the React app
+                sh 'npm run build'
+                // Create a build artifact (e.g., a Docker image)
+                // For this example, let's assume we are building a Docker image
+                sh 'docker build -t my-react-app .'
+                // Save the Docker image as an artifact
+                archiveArtifacts artifacts: 'Dockerfile,*.json,*.js,dist/*', fingerprint: true
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                // Run automated tests using Jest (assuming you're using Jest for testing)
+                sh 'npm test'
+            }
+        }
+        
+        stage('Code Quality Analysis') {
+            steps {
+                // Run code quality analysis using SonarQube scanner
+                // Make sure SonarQube scanner is installed/configured on Jenkins server
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                // Deploy the application to a test environment (e.g., staging server or Docker container)
+                // For this example, let's assume we are deploying to a Docker container
+                sh 'docker-compose -f docker-compose.test.yml up -d'
+            }
+        }
+        
+        stage('Release') {
+            steps {
+                // Promote the application to a production environment
+                // This could involve deploying to AWS, Azure, or any other cloud provider
+                // For simplicity, let's assume manual deployment for production
+                input message: 'Deploy to production?', ok: 'Release'
+            }
+        }
+        
+        stage('Monitoring and Alerting') {
+            steps {
+                // Configure monitoring and alerting using Datadog or New Relic
+                // This could involve setting up monitors and alerts for the production environment
+                // For simplicity, let's assume manual configuration
+                input message: 'Configure monitoring and alerting for production?', ok: 'Done'
+            }
+        }
+    }
+}
