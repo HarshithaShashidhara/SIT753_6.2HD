@@ -7,7 +7,7 @@ pipeline {
     
     tools {
         // Specify the Node.js installation managed by Jenkins
-        nodejs 'nodejs-installation-name'
+        nodejs 'NodeJS 14' // Replace with your Node.js installation name
     }
     
     stages {
