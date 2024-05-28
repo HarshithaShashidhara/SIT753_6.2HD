@@ -26,9 +26,12 @@ pipeline {
                 script {
                     // Read and parse package.json
                     def packageJson = readFile('package.json')
-                    def pkg = new groovy.json.JsonSlurper().parseText(packageJson)
+                    def jsonSlurper = new groovy.json.JsonSlurper()
+                    def pkg = jsonSlurper.parseText(packageJson) as Map
+                    // Convert LazyMap to HashMap
+                    def pkgMap = new HashMap(pkg)
                     // Check for the build script in package.json
-                    if (pkg.scripts && pkg.scripts.build) {
+                    if (pkgMap.scripts && pkgMap.scripts.build) {
                         sh 'npm run build'
                     } else {
                         echo 'No build script defined in package.json'
