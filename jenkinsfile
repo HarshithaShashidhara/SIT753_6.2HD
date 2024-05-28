@@ -23,10 +23,11 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm install'
-                // Check if there is a build script, otherwise skip
                 script {
+                    // Read and parse package.json
                     def packageJson = readFile('package.json')
                     def pkg = new groovy.json.JsonSlurper().parseText(packageJson)
+                    // Check for the build script in package.json
                     if (pkg.scripts && pkg.scripts.build) {
                         sh 'npm run build'
                     } else {
