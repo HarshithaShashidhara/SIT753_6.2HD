@@ -9,17 +9,17 @@ pipeline {
         nodejs 'NodeJS 14' // Replace with your Node.js installation name
     }
     
-    stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-                // List files to ensure package.json is present
-                sh 'ls -l'
-                // Show contents of package.json for debugging purposes
-                sh 'cat package.json'
-            }
-        }
-    } 
+    // stages {
+    //     stage('Checkout') {
+    //         steps {
+    //             checkout scm
+    //             // List files to ensure package.json is present
+    //             sh 'ls -l'
+    //             // Show contents of package.json for debugging purposes
+    //             sh 'cat package.json'
+    //         }
+    //     }
+    // } 
 
 
     stage('Build') {
@@ -36,7 +36,10 @@ pipeline {
             }
         }
     }
-}
-       
+    }
+
+
+    
+           
 
 }
