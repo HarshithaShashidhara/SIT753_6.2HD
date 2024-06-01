@@ -16,7 +16,7 @@ pipeline {
         stage('Tool Install') {
             steps {
                 // Example of installing tools if needed
-                tool name: 'NodeJS', type: 'NodeJSInstallation'
+                tool name: 'npm', type: 'NodeJSInstallation'
             }
         }
 
