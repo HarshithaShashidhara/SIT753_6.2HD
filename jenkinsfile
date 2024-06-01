@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        NODEJS_HOME = tool 'npm' // Use the name of the NodeJS installation tool
+        NODEJS_HOME = tool name: 'npm', type: 'NodeJSInstallation' // Use the name of the NodeJS installation configured in Jenkins
         PATH = "$NODEJS_HOME/bin:$PATH"
     }
 
@@ -15,8 +15,7 @@ pipeline {
 
         stage('Tool Install') {
             steps {
-                // Example of installing tools if needed
-                tool name: 'npm', type: 'NodeJSInstallation'
+                // No need to install tools explicitly since we're using a pre-configured NodeJS installation
             }
         }
 
