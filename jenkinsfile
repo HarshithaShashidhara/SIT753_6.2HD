@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        NODEJS_HOME = tool 'npm' // Use the name of the NodeJS installation tool
+        PATH = "$NODEJS_HOME/bin:$PATH"
+    }
+
     stages {
         stage('Declarative: Checkout SCM') {
             steps {
@@ -48,7 +53,6 @@ pipeline {
              node(null){
                 cleanWs(deleteDirs: true, disableDeferredWipeout: true)
             }
-
         }
     }
 }
