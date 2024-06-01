@@ -45,7 +45,10 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+             node(null){
+                cleanWs(deleteDirs: true, disableDeferredWipeout: true)
+            }
+
         }
     }
 }
