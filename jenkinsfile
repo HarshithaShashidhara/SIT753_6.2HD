@@ -15,7 +15,8 @@ pipeline {
 
         stage('Tool Install') {
             steps {
-                // No need to install tools explicitly since we're using a pre-configured NodeJS installation
+                 // Add your steps here
+        sh 'echo "This is an example step"'
             }
         }
 
